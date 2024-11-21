@@ -13,11 +13,10 @@
     "lane_properties": {
         "approach": "TEXT",
         "no_of_lanes": "NUMERIC",
-        "capacity per lane": "NUMERIC",
+        "capacity_per_lane": "NUMERIC",
         "alias": "TEXT"
     },
     "vehicle": {
-        "vehicle_id": "INTEGER",
         "name": "TEXT",
         "pcef": "NUMERIC"
     }
