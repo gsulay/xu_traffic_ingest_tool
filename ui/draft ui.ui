@@ -22,7 +22,7 @@ QWidget#centralwidget{
 background-color: rgb(66, 57, 61);
 }
 
-QTableWidget, QComboBox, QListWidget, QColumnView{
+QTableView, QComboBox, QListWidget, QColumnView{
 background-color:rgba(16, 15, 15, 95);
 color:white;
 }
@@ -250,7 +250,7 @@ background-color: rgba(0,0,0,50);}</string>
             </widget>
            </item>
            <item>
-            <widget class="QListWidget" name="capacityTable"/>
+            <widget class="QTableView" name="capacityTable"/>
            </item>
           </layout>
          </item>
@@ -269,7 +269,7 @@ background-color: rgba(0,0,0,50);}</string>
           <number>0</number>
          </property>
          <item>
-          <widget class="QTableWidget" name="properties_view"/>
+          <widget class="QTableView" name="pcefTable"/>
          </item>
          <item>
           <layout class="QVBoxLayout" name="propertiesLayout">
@@ -491,6 +491,7 @@ background-color: rgba(0,0,0,50);}</string>
  </widget>
  <resources>
   <include location="design.qrc"/>
+  <include location="C:/Users/Gifrey Sulay/.designer/backup/design.qrc"/>
  </resources>
  <connections/>
 </ui>

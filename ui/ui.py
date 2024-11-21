@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
 "background-color: rgb(66, 57, 61);\n"
 "}\n"
 "\n"
-"QTableWidget, QComboBox, QListWidget, QColumnView{\n"
+"QTableView, QComboBox, QListWidget, QColumnView{\n"
 "background-color:rgba(16, 15, 15, 95);\n"
 "color:white;\n"
 "}\n"
@@ -142,7 +142,7 @@ class Ui_MainWindow(object):
         self.roadCapacityLabel = QtWidgets.QLabel(parent=self.prepareWidget)
         self.roadCapacityLabel.setObjectName("roadCapacityLabel")
         self.capacityFileLayout.addWidget(self.roadCapacityLabel)
-        self.capacityTable = QtWidgets.QListWidget(parent=self.prepareWidget)
+        self.capacityTable = QtWidgets.QTableView(parent=self.prepareWidget)
         self.capacityTable.setObjectName("capacityTable")
         self.capacityFileLayout.addWidget(self.capacityTable)
         self.filesCapacitiesLayout.addLayout(self.capacityFileLayout)
@@ -153,11 +153,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setContentsMargins(-1, -1, 0, -1)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.properties_view = QtWidgets.QTableWidget(parent=self.prepareWidget)
-        self.properties_view.setObjectName("properties_view")
-        self.properties_view.setColumnCount(0)
-        self.properties_view.setRowCount(0)
-        self.horizontalLayout_3.addWidget(self.properties_view)
+        self.pcefTable = QtWidgets.QTableView(parent=self.prepareWidget)
+        self.pcefTable.setObjectName("pcefTable")
+        self.horizontalLayout_3.addWidget(self.pcefTable)
         self.propertiesLayout = QtWidgets.QVBoxLayout()
         self.propertiesLayout.setObjectName("propertiesLayout")
         self.pcefButton = QtWidgets.QPushButton(parent=self.prepareWidget)
