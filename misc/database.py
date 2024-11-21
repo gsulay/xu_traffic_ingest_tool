@@ -71,7 +71,9 @@ def generate_database(path, out_db):
     print(f"Created DB: {out_db}")
 
 class FileManager:
-    def __init__(self):
+    """File Manager for the program"""
+    
+    def __init__(self):        
         self.storage = {'display_name':[],
                         'path':[],
                         'type':[]}
@@ -89,6 +91,11 @@ class FileManager:
     def get_storage(self):
         return self.storage
     
+    def add_pcef(self, file_path):
+        self.storage['pcef'] = file_path
+    
+    def add_capacity(self, file_path):
+        self.storage['capacity'] = file_path
     def reset(self):
         self.storage = {'display_name':[],
                         'path':[],
@@ -247,3 +254,54 @@ def midblock_to_db(wb_path, database_path):
         
     conn.commit()
     conn.close()
+
+def pcef_to_db(wb_path, database_path):
+    """
+    Inserts data from a PCEF Excel file into a SQLite database.
+
+    Parameters:
+        wb_path (str): The path to the Excel file.
+        database_path (str): The path to the SQLite database.
+
+    Returns:
+        None
+    """
+    df = pd.read_excel(wb_path)
+
+    #Connects to the server
+    conn = sqlite3.connect(database_path)
+    cur = conn.cursor()
+
+    data = df.to_numpy()
+    for row in data:
+        cur.execute(f"INSERT INTO vehicle VALUES ('{row[0]}', {row[1]})")
+    conn.commit()
+    conn.close()
+
+    return True
+
+def capacity_to_db(wb_path, database_path):
+    """
+    Inserts data from a Capacity Excel file into a SQLite database.
+
+    Parameters:
+        wb_path (str): The path to the Excel file.
+        database_path (str): The path to the SQLite database.
+
+    Returns:
+        None
+    """
+    df = pd.read_excel(wb_path)
+
+    #Connects to the server
+    conn = sqlite3.connect(database_path)
+    cur = conn.cursor()
+
+    data = df.to_numpy()
+    for row in data:
+        cur.execute(f"INSERT INTO lane_properties VALUES ('{row[0]}', {row[1]}, {row[2]}, '{row[3]}')")
+    
+    conn.commit()
+    conn.close()
+
+    return True
