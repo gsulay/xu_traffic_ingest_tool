@@ -1,0 +1,24 @@
+{
+    "data": {
+        "project_id": "TEXT",
+        "date": "TEXT",
+        "time_start": "NUMERIC",
+        "time_end": "NUMERIC",
+        "approach": "TEXT",
+        "egress": "TEXT",
+        "type": "TEXT",
+        "vehicle_id": "TEXT",
+        "count": "NUMERIC"
+    },
+    "lane_properties": {
+        "approach": "TEXT",
+        "no_of_lanes": "NUMERIC",
+        "capacity per lane": "NUMERIC",
+        "alias": "TEXT"
+    },
+    "vehicle": {
+        "vehicle_id": "INTEGER",
+        "name": "TEXT",
+        "pcef": "NUMERIC"
+    }
+}
