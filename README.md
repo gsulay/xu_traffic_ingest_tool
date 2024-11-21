@@ -13,7 +13,7 @@ A simple GUI application to import data from various traffic surveys into a SQLi
 ## Installation
 
 1. Clone the repository using `git clone https://github.com/gsulay/tvc-data-ingestor.git`
-2. Install the required dependencies using `pip install -r requirements.txt`
+2. Install the required dependencies using `pip install -r requirements.txt`. Supported Python Versions `Python>=3.10`
 3. Run the application using `python main.py`
 
 ## Usage
