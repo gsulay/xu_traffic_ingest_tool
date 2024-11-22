@@ -107,15 +107,23 @@ def file_check(file:Path|str, type:str):
         Check Criteria:
         
         
-            Midblock: 
+            MB: 
                 Cell['A1'] == 'Project ID'
                 Cell['A2'] == 'Time Start'
                 Cell['B2'] == 'Time End'
                 
-            TVC:    
+            3LI:    
+                Cell['A2'] == 'TIME'
+                Cell['B2'] == 'Start Hour'
+                Cell['D2'] == 'End Hour'
+
+            4LI:    
                 Cell['A1'] == 'TIME'
                 Cell['B1'] == 'Start Hour'
-                Cell['D1'] == 'End Hour'"""
+                Cell['D1'] == 'End Hour'
+                
+            SS: CurrentlyWorking
+            """
         
         file = xl.load_workbook(file)
         file = file.active
@@ -129,7 +137,17 @@ def file_check(file:Path|str, type:str):
                 return True
             else:
                 return False
-        elif type == '4LI' or type == '3LI':
+        elif type == '3LI':
+            t_start = file['B2'].value
+            t_end = file['D2'].value
+            time_text = file['A2'].value
+
+            if (t_start == 'Start Hour') and (t_end == 'End Hour') and (time_text == 'TIME'):
+                return True
+            else:
+                return False
+        
+        elif type == '4LI':
             t_start = file['B1'].value
             t_end = file['D1'].value
             time_text = file['A1'].value
@@ -140,7 +158,7 @@ def file_check(file:Path|str, type:str):
                 return False
         
         else:
-            raise Exception("Invalid type")
+            raise ValueError("Invalid file type")
 
 
 def fourleg_intersection_to_db(wb_path, database_path):
@@ -180,6 +198,71 @@ def fourleg_intersection_to_db(wb_path, database_path):
     approach_egress = []
     for idx, val in enumerate(egress):
         approach_idx = math.floor(idx/3)
+        approach_egress.append(f"{approach[approach_idx]}-{val}")
+    approach_egress
+
+    #Creating the dataframe
+    df = pd.DataFrame(data_arr, columns=approach_egress, index=vehicles)
+
+    #Getting the index and colums for navigating the dataframe using loc
+    a_e_headers = df.columns.values.tolist()
+    vehicles = df.index.values.reshape(1,-1)
+    date = pd.to_datetime(date.value).date()
+
+    #Connects to the server
+    conn = sqlite3.connect(database_path)
+    cur = conn.cursor()
+
+    for vehicle in vehicles[0]:    #Adds the data
+        vehicle = vehicle[0]
+        # vehicle = vehicle[0][0]
+
+        for a_e in a_e_headers:
+            count = float(df.loc[vehicle,a_e])
+            app = a_e.split('-')[0]
+            egg = a_e.split('-')[1]
+            cur.execute(f"INSERT INTO data VALUES ('{project_id}', '{date}', {start_hour.value}, {end_hour.value}, '{app}', '{egg}', 'intersection','{vehicle}', {count})")
+
+    conn.commit()
+    conn.close()
+
+def threeleg_intersection_to_db(wb_path, database_path):
+    """
+    This function reads data from 4-Leg intersection Excel file and inserts it into a SQLite database.
+
+    Parameters:
+        wb_path (str): The path to the Excel file.
+        database_path (str): The path to the SQLite database.
+
+    Returns:
+        None
+    """
+    wb = xl.load_workbook(wb_path)
+    ws = wb.active
+
+
+    #Get the start Hour
+    start_hour  = ws['C2']
+    end_hour    = ws['E2']
+    project_id  = ws['B1'].value
+    date        = ws['G2']
+    approach    = [i.value for i in ws['B3:G3'][0] if i.value != None]
+    egress      = [i.value for i in ws['B4:G4'][0]]
+    vehicles    = [[i[0].value for i in ws['A5:A12']]]
+    data        = ws['B5:G12']
+
+    #Transforms the openpyxl cell to actual data
+    data_arr = []
+    for row in data:
+        row_arry = []
+        for val in row:
+            row_arry.append(val.value)
+        data_arr.append(row_arry)
+
+    #Creating the approach egress pairs for dataframe header
+    approach_egress = []
+    for idx, val in enumerate(egress):
+        approach_idx = math.floor(idx/2)
         approach_egress.append(f"{approach[approach_idx]}-{val}")
     approach_egress
 

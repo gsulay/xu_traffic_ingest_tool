@@ -1,0 +1,18 @@
+{
+    "data": {
+        "project_id": "TEXT",
+        "date": "TEXT",
+        "time_start": "NUMERIC",
+        "time_end": "NUMERIC",
+        "direction": "TEXT",
+        "type": "TEXT",
+        "vehicle_id": "TEXT",
+        "distance": "NUMERIC",
+        "time": "NUMERIC"
+    },
+    "vehicle": {
+        "name": "TEXT",
+        "pcef": "NUMERIC"
+    }
+}
+

@@ -1,99 +1,20 @@
 import os
-from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QTableView, QHeaderView
+from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QHeaderView
 from ui.ui import Ui_MainWindow
 import ui.resources as resources
 from pathlib import Path
 import shutil
-from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
 from PyQt6.QtGui import QShortcut
 from misc.database import *
-import openpyxl as xl
+from misc.helper import PandasModel
+from misc.info import EssentialData
 
-class PandasModel(QAbstractTableModel):
-    """A model to interface a Qt view with pandas dataframe """
-
-    def __init__(self, dataframe: pd.DataFrame, parent=None):
-        QAbstractTableModel.__init__(self, parent)
-        self._dataframe = dataframe
-
-    def rowCount(self, parent=QModelIndex()) -> int:
-        """ Override method from QAbstractTableModel
-
-        Return row count of the pandas DataFrame
-        """
-        if parent == QModelIndex():
-            return len(self._dataframe)
-
-        return 0
-
-    def columnCount(self, parent=QModelIndex()) -> int:
-        """Override method from QAbstractTableModel
-
-        Return column count of the pandas DataFrame
-        """
-        if parent == QModelIndex():
-            return len(self._dataframe.columns)
-        return 0
-
-    def data(self, index: QModelIndex, role=Qt.ItemDataRole):
-        """Override method from QAbstractTableModel
-
-        Return data cell from the pandas DataFrame
-        """
-        if not index.isValid():
-            return None
-
-        if role == Qt.ItemDataRole.DisplayRole:
-            return str(self._dataframe.iloc[index.row(), index.column()])
-
-        return None
-
-    def headerData(
-        self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole
-    ):
-        """Override method from QAbstractTableModel
-
-        Return dataframe index as vertical header data and columns as horizontal header data.
-        """
-        if role == Qt.ItemDataRole.DisplayRole:
-            if orientation == Qt.Orientation.Horizontal:
-                return str(self._dataframe.columns[section])
-
-            if orientation == Qt.Orientation.Vertical:
-                return str(self._dataframe.index[section])
-
-        return None
-
-type_properties = {
-    "TVC: 4-Leg Intersection": {
-        "template": Path(r"bin/essential data/4-Leg Template.xlsx"),
-        "type": "4LI",
-        "schema": Path(r"bin/database_format/tvc_schema.json")
-    },
-    "TVC: 3-Leg Intersection": {
-        "template": Path(r"bin/essential data/3-Leg Template.xlsx"),
-        "type": "3LI",
-        "schema": Path(r"bin/database_format/tvc_schema.json")
-    },
-    "TVC: Midblock": {
-        "template": Path(r"bin/essential data/Midblock Template.xlsx"),
-        "type": "MB",
-        "schema": Path(r"bin/database_format/tvc_schema.json")
-    },
-    "Spot Speed": {
-        "template": Path(r"bin/essential data/Spot Speed Template.xlsx"),
-        "type": "Spot Speed",
-        "schema": Path(r"bin/database_format/sss_schema.json")
-    }
-}
+type_properties = EssentialData.TypeProperties
 
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self):
-        
         super().__init__()
-        
         self.setupUi(self)
-
         
         self.type_select.addItems(list(type_properties.keys()))
         self.type_select.setCurrentIndex(0)
@@ -112,7 +33,6 @@ class Window(QMainWindow, Ui_MainWindow):
         self.newDataBaseButton.clicked.connect(self.create_database)  #function for creating database
         self.deleteSurveyButton.clicked.connect(self.delete_survey)  #function for deleting survey
         self.exportButton.clicked.connect(self.export_database)
-        
 
         self.pcefButton.clicked.connect(self.load_pcef)
         self.capacityButton.clicked.connect(self.load_capacity) 
@@ -136,7 +56,9 @@ class Window(QMainWindow, Ui_MainWindow):
                 self.pcefTable.setModel(tableModel)
                 self.pcefTable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
                 self.pcefTable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+                self.pcefTable.horizontalHeader().setVisible(False)
                 self.storage.add_pcef(open_path)
+        
         except FileNotFoundError:
             QMessageBox.critical(self, "Error", "No file selected")
             self.statusbar.showMessage("No file selected")
@@ -156,6 +78,7 @@ class Window(QMainWindow, Ui_MainWindow):
                 self.capacityTable.setModel(tableModel)
                 self.capacityTable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
                 self.capacityTable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+                self.capacityTable.horizontalHeader().setVisible(False)
                 self.storage.add_capacity(open_path)
 
         except FileNotFoundError:
@@ -214,7 +137,7 @@ class Window(QMainWindow, Ui_MainWindow):
             QMessageBox.critical(self, "Error", "Survey Type not supported")
             return False
         
-        capacity_path = os.path.join(os.getcwd(), 'Capacity Template.xlsx')
+        capacity_path = os.path.join(Path(folder_path), 'Capacity Template.xlsx')
         df = pd.DataFrame({header: [] for header in headers})
         df['Approach'] = data
         df.to_excel(capacity_path, index=False)
@@ -242,11 +165,14 @@ class Window(QMainWindow, Ui_MainWindow):
                                                     directory=initial_dir,
                                                     filter=filter)
             for file in filenames:
-                valid = file_check(file, type_properties[self.type_select.currentText()]['type'])
-                if valid == False:
+                try:
+                    valid = file_check(file, type_properties[self.type_select.currentText()]['type'])
+                    if valid == False:
+                        QMessageBox.critical(self, "Error", f"Invalid file. {file} is not a valid file. Will skip file.")
+                        continue
+                except ValueError:  #Error Handling if the survey type is not supported
                     QMessageBox.critical(self, "Error", f"Invalid file. {file} is not a valid file. Will skip file.")
-                    continue
-
+                
                 #Adds the file to the list (only the basefile without prefixes)
                 self.storage.quick_append(file, type_properties[self.type_select.currentText()]['type'])
                 self.ingest_data_list.clear()
@@ -336,12 +262,14 @@ class Window(QMainWindow, Ui_MainWindow):
         all_surveys = self.storage.get_storage()['path']
         
         for survey in all_surveys:
-            if (current_type == '4LI') or (current_type == '3LI'):
+            if (current_type == '4LI'):
                 fourleg_intersection_to_db(survey, out_path)
+            elif (current_type == '3LI'):
+                threeleg_intersection_to_db(survey, out_path)
             elif (current_type == 'MB'):
                 midblock_to_db(survey, out_path)
             # TODO: Add spot speed
-            # if (current_type == 'Spot Speed'):
+            # if (current_type == 'SSS'):
             #     spot_speed_to_db(survey, out_path)
             else:
                 QMessageBox(
@@ -371,4 +299,3 @@ if __name__ == "__main__":
     window = Window()
     window.show()
     app.exec()
-

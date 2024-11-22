@@ -22,7 +22,7 @@ QWidget#centralwidget{
 background-color: rgb(66, 57, 61);
 }
 
-QTableView, QComboBox, QListWidget, QColumnView{
+QTableView, QComboBox, QListWidget, QColumnView, QLineEdit{
 background-color:rgba(16, 15, 15, 95);
 color:white;
 }
@@ -156,7 +156,7 @@ color:rgb(190, 190, 190)
 QPushButton:hover{
 background-color: rgba(0,0,0,50);}</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,3,0,1,0,1,0,2">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,2,0,1,0,0,0">
        <item>
         <layout class="QHBoxLayout" name="logo_and_select" stretch="5,3,0">
          <property name="leftMargin">
@@ -398,53 +398,16 @@ background-color: rgba(0,0,0,50);}</string>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="filesPreview">
-         <property name="text">
-          <string>Properties View</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="preview" stretch="0,8">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,8">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,8">
-           <item>
-            <spacer name="verticalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="savePreviewButton">
-             <property name="text">
-              <string>Load Project Details</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
+          <widget class="QLabel" name="projectNameLabel">
+           <property name="text">
+            <string>Set Project Name</string>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QTableWidget" name="previewTable"/>
+          <widget class="QLineEdit" name="projectNameEdit"/>
          </item>
         </layout>
        </item>
@@ -491,7 +454,7 @@ background-color: rgba(0,0,0,50);}</string>
  </widget>
  <resources>
   <include location="design.qrc"/>
-  <include location="C:/Users/Gifrey Sulay/.designer/backup/design.qrc"/>
+  <include location="design.qrc"/>
  </resources>
  <connections/>
 </ui>
